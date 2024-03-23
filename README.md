@@ -2,6 +2,15 @@
 Easily flash Sonoff devices with [Sonoff-Homekit](https://github.com/Gruppio/Sonoff-Homekit) firmware using [esptool](https://github.com/espressif/esptool) with a GUI.<br>
 ![Screenshot of Sonoff Homekit Flasher](assets/Hero.png?raw=true)
 Built with [Tauri](https://tauri.app/) and [SolidJS](https://www.solidjs.com/)
+
+## Installation
+Go to [Releases](https://github.com/lockieluke/sonoff-homekit-flasher/releases) and download the latest release
+
+**This is an unsigned build, you might have to run the following command upon first launch:**
+```shell
+# App Path should be "/Applications/Sonoff Homekit Flasher.app", include the quotes for proper escaping
+sudo xattr -r -d com.apple.quarantine [APP PATH]
+```
 ## Build
 
 Make sure you have [Bun](https://bun.sh/) and [Rust](https://www.rust-lang.org/) installed
