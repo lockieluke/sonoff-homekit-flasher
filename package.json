@@ -1,0 +1,38 @@
+{
+  "name": "sonoff-homekit-flasher",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "tauri": "tauri",
+    "build:macos": "tauri build --target universal-apple-darwin"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@kobalte/core": "^0.12.6",
+    "@tabler/icons-solidjs": "^2.47.0",
+    "@tauri-apps/api": "^1",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "nanoevents": "^9.0.0",
+    "solid-icons": "^1.1.0",
+    "solid-js": "^1.7.8",
+    "tailwind-merge": "^2.2.2",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1",
+    "@types/bun": "^1.0.10",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "sass": "^1.72.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0",
+    "vite-plugin-solid": "^2.8.0"
+  }
+}
