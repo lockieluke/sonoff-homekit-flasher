@@ -1,6 +1,6 @@
 # Sonoff HomeKit Flasher
 Easily flash Sonoff devices with [Sonoff-Homekit](https://github.com/Gruppio/Sonoff-Homekit) firmware using [esptool](https://github.com/espressif/esptool) with a GUI.<br>
-![Screenshot of Sonoff Homekit Flasher](assets/Hero.png?raw=true)
+![Screenshot of Sonoff Homekit Flasher](assets/Sonoff%20Homekit%20Flasher.gif?raw=true)
 Built with [Tauri](https://tauri.app/) and [SolidJS](https://www.solidjs.com/)
 
 ## Installation
