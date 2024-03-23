@@ -25,7 +25,7 @@ bun install
 ### Build your own esptool
 Clone repository and navigate into it
 ```shell
-git clone 
+git clone https://github.com/espressif/esptool.git
 ```
 Build macOS universal binary and pop it into `src-tauri/bin` and replace all darwin binaries with it:
 ```shell
