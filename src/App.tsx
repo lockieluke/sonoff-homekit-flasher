@@ -18,6 +18,7 @@ import InstructionsIMG from "@src/assets/Instructions.png";
 
 export default function App() {
     let flashButton: HTMLButtonElement | null = null;
+    let firstRender = false;
 
     const [selectedUSBDevice, setSelectedUSBDevice] = createSignal<string>();
     const [showNoSelectedAlert, setShowNoSelectedAlert] = createSignal(false);
@@ -27,29 +28,33 @@ export default function App() {
     const [usbList, {refetch}] = createResource(USB.getUSBList);
 
     createEffect(async () => {
-        USB.on("succeeded", port => {
-            flashButton!.disabled = false;
-            showToast({
-                title: "Flashing Succeeded",
-                description: `Successfully flashed the firmware to ${port}.`,
-                duration: 5000
+        if (!firstRender) {
+            USB.on("succeeded", port => {
+                flashButton!.disabled = false;
+                showToast({
+                    title: "Flashing Succeeded",
+                    description: `Successfully flashed the firmware to ${port}.`,
+                    duration: 5000
+                });
+                setProgress(undefined);
             });
-            setProgress(undefined);
-        });
 
-        USB.on("failed", () => {
-            flashButton!.disabled = false;
-            showToast({
-                title: "Flashing Failed",
-                description: `Failed to flash the firmware`,
-                duration: 5000
+            USB.on("failed", () => {
+                flashButton!.disabled = false;
+                showToast({
+                    title: "Flashing Failed",
+                    description: `Failed to flash the firmware`,
+                    duration: 5000
+                });
+                setProgress(undefined);
             });
-            setProgress(undefined);
-        });
 
-        USB.on("progress", message => setProgress(message));
+            USB.on("progress", message => setProgress(message));
 
-        await invoke("show_main_window");
+            await invoke("show_main_window");
+
+            firstRender = true;
+        }
     }, []);
 
     return (<>
