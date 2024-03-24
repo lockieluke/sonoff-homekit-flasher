@@ -26,8 +26,10 @@ export default class USB {
             listener();
             progressListener();
         });
-        const failedListener = await listen("flash-failed", () => {
-            this.emitter.emit("failed", "Failed to flash the firmware.");
+        const failedListener = await listen("flash-failed", ({payload}) => {
+            const message: string = (payload as never)["message"];
+
+            this.emitter.emit("failed", `Failed to flash the firmware: ${message}`);
             failedListener();
             progressListener();
         });

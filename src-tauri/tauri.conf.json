@@ -37,7 +37,8 @@
         "resizable": false,
         "hiddenTitle": true,
         "minimizable": false,
-        "visible": false
+        "visible": false,
+        "center": true
       }
     ],
     "security": {
