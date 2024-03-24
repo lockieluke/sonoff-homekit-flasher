@@ -3,7 +3,8 @@
 
 #![feature(let_chains)]
 
-use tauri::Window;
+use tauri::{Icon, Manager, Window};
+
 use crate::usb::{flash_firmware, get_usb_list};
 
 mod usb;
@@ -23,6 +24,14 @@ fn main() {
             get_usb_list,
             flash_firmware
         ])
+        .setup(|app| {
+            let window = app.get_window("main").unwrap();
+            if cfg!(windows) {
+                window.set_icon(Icon::Raw(include_bytes!("../icons/icon.ico").to_vec())).expect("Failed to change icon");
+            }
+
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

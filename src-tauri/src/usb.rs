@@ -52,6 +52,8 @@ pub fn flash_firmware(window: Window, app: AppHandle, port: String) {
 
     let window = Arc::new(Mutex::new(window));
     let exited = Arc::new(Mutex::new(false));
+    let stdout = Arc::new(Mutex::new(String::new()));
+    let stderr = Arc::new(Mutex::new(String::new()));
 
     tauri::async_runtime::spawn(async move {
         while let Some(event) = rx.recv().await {
@@ -61,7 +63,9 @@ pub fn flash_firmware(window: Window, app: AppHandle, port: String) {
                         window.lock().unwrap().emit("flash-succeeded", json!({})).unwrap();
                         println!("Firmware flashed successfully");
                     } else {
-                        window.lock().unwrap().emit("flash-failed", json!({})).unwrap();
+                        window.lock().unwrap().emit("flash-failed", json!({
+                            "message": stderr.lock().unwrap().to_owned()
+                        })).unwrap();
                         println!("Firmware flashing failed with exit code {}", exit_code);
                     }
                     *exited.lock().unwrap() = true;
@@ -72,6 +76,7 @@ pub fn flash_firmware(window: Window, app: AppHandle, port: String) {
             if let CommandEvent::Stdout(ref line) = event {
                 if line.starts_with("Writing at 0x000") {
                     let line = line.trim_end();
+                    stdout.lock().unwrap().push_str(line);
                     window.lock().unwrap().emit("flash-progress", json!({
                         "message": line
                     })).unwrap();
@@ -79,10 +84,8 @@ pub fn flash_firmware(window: Window, app: AppHandle, port: String) {
             }
 
             if let CommandEvent::Stderr(ref line) = event {
-                println!("{}", line);
-                window.lock().unwrap().emit("flash-failed", json!({
-                    "message": line
-                })).unwrap();
+                let line = line.trim_end();
+                stderr.lock().unwrap().push_str(line);
             }
         }
     });
