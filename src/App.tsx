@@ -39,11 +39,11 @@ export default function App() {
                 setProgress(undefined);
             });
 
-            USB.on("failed", () => {
+            USB.on("failed", error => {
                 flashButton!.disabled = false;
                 showToast({
                     title: "Flashing Failed",
-                    description: `Failed to flash the firmware`,
+                    description: error,
                     duration: 5000
                 });
                 setProgress(undefined);
