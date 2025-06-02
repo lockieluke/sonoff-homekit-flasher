@@ -1,7 +1,7 @@
 [package]
 name = "sonoff-homekit-flasher"
-version = "0.0.0"
-description = "A Tauri App"
+version = "0.0.1"
+description = "Sonoff Homekit Flasher"
 authors = ["you"]
 edition = "2021"
 
