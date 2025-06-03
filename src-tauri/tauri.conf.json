@@ -24,7 +24,13 @@
     ],
     "externalBin": [
       "bin/esptool"
-    ]
+    ],
+    "macOS": {
+      "entitlements": "./Entitlements.plist",
+      "hardenedRuntime": true,
+      "minimumSystemVersion": "10.15",
+      "providerShortName": "lockie.dev"
+    }
   },
   "productName": "Sonoff Homekit Flasher",
   "mainBinaryName": "Sonoff Homekit Flasher",
