@@ -13,7 +13,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@src/components/ui/tool
 import USB from "@src/lib/usb.ts";
 import { IconReload } from "@tabler/icons-solidjs";
 import { invoke } from "@tauri-apps/api/core";
-import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { open } from "@tauri-apps/plugin-shell";
 import { createEffect, createResource, createSignal, DEV } from "solid-js";
 
