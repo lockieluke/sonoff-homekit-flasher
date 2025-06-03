@@ -1,6 +1,6 @@
 [package]
 name = "sonoff-homekit-flasher"
-version = "0.0.1"
+version = "0.0.2"
 description = "Sonoff Homekit Flasher"
 authors = ["lockie.dev"]
 edition = "2021"
