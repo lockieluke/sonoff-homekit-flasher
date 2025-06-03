@@ -1,36 +1,36 @@
 use std::sync::{Arc, Mutex};
 
-use serde_json::json;
-use tauri::{AppHandle, Window};
-use tauri::api::process::{Command, CommandEvent};
-
 use crate::utils::pathbuf_to_string;
+use serde_json::json;
+use tauri::path::BaseDirectory;
+use tauri::{AppHandle, Emitter, Manager, Window};
+use tauri_plugin_shell::process::CommandEvent;
+use tauri_plugin_shell::ShellExt;
 
 #[tauri::command]
 pub fn get_usb_list() -> Vec<String> {
     let ports = tokio_serial::available_ports().unwrap();
 
-    ports
-        .iter()
-        .map(|port| port.port_name.to_owned())
-        .collect()
+    ports.iter().map(|port| port.port_name.to_owned()).collect()
 }
 
 #[tauri::command]
 pub fn flash_firmware(window: Window, app: AppHandle, port: String) {
     println!("Flashing firmware to {}", port);
-    let rboot_path = app.path_resolver()
-        .resolve_resource("resources/rboot.bin")
+    let rboot_path = app
+        .path()
+        .resolve("rboot.bin", BaseDirectory::Resource)
         .unwrap();
-    let blank_config_path = app.path_resolver()
-        .resolve_resource("resources/blank_config.bin")
+    let blank_config_path = app
+        .path()
+        .resolve("blank_config.bin", BaseDirectory::Resource)
         .unwrap();
-    let firmware_path = app.path_resolver()
-        .resolve_resource("resources/Sonoff_ON.bin")
+    let firmware_path = app
+        .path()
+        .resolve("Sonoff_ON.bin", BaseDirectory::Resource)
         .unwrap();
 
-    let (mut rx, ..) = Command::new_sidecar("esptool")
-        .expect("Failed to spawn esptool")
+    let (mut rx, ..) = app.shell().command("esptool")
         .args([
             "--baud=115200".into(),
             format!("-p={}", port),
@@ -43,7 +43,7 @@ pub fn flash_firmware(window: Window, app: AppHandle, port: String) {
             "0x1000".into(),
             pathbuf_to_string(&blank_config_path),
             "0x2000".into(),
-            pathbuf_to_string(&firmware_path)
+            pathbuf_to_string(&firmware_path),
         ])
         .spawn()
         .expect("Failed to flash firmware");
@@ -57,35 +57,61 @@ pub fn flash_firmware(window: Window, app: AppHandle, port: String) {
 
     tauri::async_runtime::spawn(async move {
         while let Some(event) = rx.recv().await {
-            if let CommandEvent::Terminated(ref exit) = event {
-                if let Some(exit_code) = exit.code && exited.lock().unwrap().eq(&false) {
-                    if exit_code == 0 {
-                        window.lock().unwrap().emit("flash-succeeded", json!({})).unwrap();
-                        println!("Firmware flashed successfully");
-                    } else {
-                        window.lock().unwrap().emit("flash-failed", json!({
-                            "message": stderr.lock().unwrap().to_owned()
-                        })).unwrap();
-                        println!("Firmware flashing failed with exit code {}", exit_code);
-                    }
-                    *exited.lock().unwrap() = true;
-                    break;
-                }
-            }
-
-            if let CommandEvent::Stdout(ref line) = event {
-                if line.starts_with("Writing at 0x000") {
+            match event {
+                CommandEvent::Stderr(line) => {
+                    let line = String::from_utf8(line).expect("Failed to read stderr as utf8");
                     let line = line.trim_end();
-                    stdout.lock().unwrap().push_str(line);
-                    window.lock().unwrap().emit("flash-progress", json!({
-                        "message": line
-                    })).unwrap();
+                    stderr.lock().unwrap().push_str(line);
                 }
-            }
+                CommandEvent::Stdout(line) => {
+                    let line = String::from_utf8(line).expect("Failed to read stdout as utf8");
 
-            if let CommandEvent::Stderr(ref line) = event {
-                let line = line.trim_end();
-                stderr.lock().unwrap().push_str(line);
+                    if line.starts_with("Writing at 0x000") {
+                        let line = line.trim_end();
+                        stdout.lock().unwrap().push_str(line);
+                        window
+                            .lock()
+                            .unwrap()
+                            .emit(
+                                "flash-progress",
+                                json!({
+                                "message": line
+                            }),
+                            )
+                            .unwrap();
+                    }
+                }
+                CommandEvent::Terminated(exit) => {
+                    if exited.lock().unwrap().eq(&false)
+                    {
+                        let exit_code = exit.code.unwrap_or(1);
+                        if exit_code == 0 {
+                            window
+                                .lock()
+                                .unwrap()
+                                .emit("flash-succeeded", json!({}))
+                                .unwrap();
+                            println!("Firmware flashed successfully");
+                        } else {
+                            window
+                                .lock()
+                                .unwrap()
+                                .emit(
+                                    "flash-failed",
+                                    json!({
+                                    "message": stderr.lock().unwrap().to_owned()
+                                }),
+                                )
+                                .unwrap();
+                            println!("Firmware flashing failed with exit code {}", exit_code);
+                        }
+                        *exited.lock().unwrap() = true;
+                        break;
+                    }
+                }
+                _ => {
+
+                }
             }
         }
     });

@@ -1,9 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
 #![feature(let_chains)]
 
-use tauri::{Icon, Manager, Window};
+use tauri::{image::Image, AppHandle, Manager};
 
 use crate::usb::{flash_firmware, get_usb_list};
 
@@ -11,23 +10,28 @@ mod usb;
 mod utils;
 
 #[tauri::command]
-fn show_main_window(window: Window) {
-    window.show().unwrap();
+fn show_main_window(app: AppHandle) {
+    let window = app.get_webview_window("main").unwrap();
+    window.show().expect("Failed to show main window");
 }
 
 fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![
-            // Main Window
+            // Show main window
             show_main_window,
             // USB Helper
             get_usb_list,
             flash_firmware
         ])
         .setup(|app| {
-            let window = app.get_window("main").unwrap();
+            let window = app.get_webview_window("main").unwrap();
             if cfg!(windows) {
-                window.set_icon(Icon::Raw(include_bytes!("../icons/icon.ico").to_vec())).expect("Failed to change icon");
+                window
+                    .set_icon(Image::from_bytes(include_bytes!("../icons/icon.ico")).unwrap())
+                    .expect("Failed to change icon");
             }
 
             Ok(())

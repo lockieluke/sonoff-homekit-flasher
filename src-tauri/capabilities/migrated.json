@@ -1,0 +1,31 @@
+{
+  "identifier": "migrated",
+  "description": "permissions that were migrated from v1",
+  "local": true,
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "core:default",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        "$RESOURCE/*"
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "args": true,
+          "cmd": "",
+          "name": "bin/esptool",
+          "sidecar": true
+        }
+      ]
+    },
+    "shell:allow-open",
+    "fs:default",
+    "shell:default"
+  ]
+}

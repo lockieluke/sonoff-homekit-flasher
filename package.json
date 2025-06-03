@@ -17,7 +17,9 @@
   "dependencies": {
     "@kobalte/core": "^0.12.6",
     "@tabler/icons-solidjs": "^2.47.0",
-    "@tauri-apps/api": "^1.6.0",
+    "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-fs": "~2",
+    "@tauri-apps/plugin-shell": "~2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "nanoevents": "^9.0.0",
@@ -28,7 +30,7 @@
     "tmp-promise": "^3.0.3"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.6.0",
+    "@tauri-apps/cli": "^2.5.0",
     "@types/async-exit-hook": "^2.0.2",
     "@types/bun": "^1.1.6",
     "@types/fs-extra": "^11.0.4",

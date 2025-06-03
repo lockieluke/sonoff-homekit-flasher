@@ -1,60 +1,56 @@
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@src/components/ui/select.tsx";
-import {createEffect, createResource, createSignal, DEV} from "solid-js";
-import USB from "@src/lib/usb.ts";
-import {Button} from "@src/components/ui/button.tsx";
-import {ColorModeProvider, ColorModeScript} from "@kobalte/core";
+import { ColorModeProvider, ColorModeScript } from "@kobalte/core";
+import InstructionsIMG from "@src/assets/Instructions.png";
 import {
     AlertDialog,
     AlertDialogContent,
     AlertDialogDescription,
     AlertDialogTitle
 } from "@src/components/ui/alert-dialog.tsx";
-import {IconReload} from "@tabler/icons-solidjs";
-import {open} from "@tauri-apps/api/shell";
-import {showToast, Toaster} from "@src/components/ui/toast.tsx";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@src/components/ui/tooltip.tsx";
-import {invoke} from "@tauri-apps/api";
-import InstructionsIMG from "@src/assets/Instructions.png";
+import { Button } from "@src/components/ui/button.tsx";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@src/components/ui/select.tsx";
+import { showToast, Toaster } from "@src/components/ui/toast.tsx";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@src/components/ui/tooltip.tsx";
+import USB from "@src/lib/usb.ts";
+import { IconReload } from "@tabler/icons-solidjs";
+import { invoke } from "@tauri-apps/api/core";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { open } from "@tauri-apps/plugin-shell";
+import { createEffect, createResource, createSignal, DEV } from "solid-js";
 
 export default function App() {
     let flashButton: HTMLButtonElement | null = null;
-    let firstRender = false;
 
     const [selectedUSBDevice, setSelectedUSBDevice] = createSignal<string>();
     const [showNoSelectedAlert, setShowNoSelectedAlert] = createSignal(false);
     const [showInstructions, setShowInstructions] = createSignal(false);
     const [progress, setProgress] = createSignal<string>();
 
-    const [usbList, {refetch}] = createResource(USB.getUSBList);
+    const [usbList, { refetch }] = createResource(USB.getUSBList);
 
     createEffect(async () => {
-        if (!firstRender) {
-            USB.on("succeeded", port => {
-                flashButton!.disabled = false;
-                showToast({
-                    title: "Flashing Succeeded",
-                    description: `Successfully flashed the firmware to ${port}.`,
-                    duration: 5000
-                });
-                setProgress(undefined);
+        USB.on("succeeded", port => {
+            flashButton!.disabled = false;
+            showToast({
+                title: "Flashing Succeeded",
+                description: `Successfully flashed the firmware to ${port}.`,
+                duration: 5000
             });
+            setProgress(undefined);
+        });
 
-            USB.on("failed", error => {
-                flashButton!.disabled = false;
-                showToast({
-                    title: "Flashing Failed",
-                    description: error,
-                    duration: 5000
-                });
-                setProgress(undefined);
+        USB.on("failed", error => {
+            flashButton!.disabled = false;
+            showToast({
+                title: "Flashing Failed",
+                description: error,
+                duration: 5000
             });
+            setProgress(undefined);
+        });
 
-            USB.on("progress", message => setProgress(message));
+        USB.on("progress", message => setProgress(message));
 
-            await invoke("show_main_window");
-
-            firstRender = true;
-        }
+        await invoke("show_main_window");
     }, []);
 
     return (<>
