@@ -30,7 +30,8 @@ pub fn flash_firmware(window: Window, app: AppHandle, port: String) {
         .resolve("Sonoff_ON.bin", BaseDirectory::Resource)
         .unwrap();
 
-    let (mut rx, ..) = app.shell().command("esptool")
+    let (mut rx, ..) = app.shell().sidecar("esptool")
+        .expect("Failed to get esptool sidecar")
         .args([
             "--baud=115200".into(),
             format!("-p={}", port),
