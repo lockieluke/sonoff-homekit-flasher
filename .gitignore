@@ -5,5 +5,8 @@ dist
 .idea/
 .vscode/
 
+# Environment
+.env.*
+
 # DS Store
 .DS_Store
