@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![feature(let_chains)]
 
-use tauri::{image::Image, AppHandle, Manager};
+use tauri::{image::Image, Manager};
 
 use crate::usb::{flash_firmware, get_usb_list};
 
@@ -10,9 +10,8 @@ mod usb;
 mod utils;
 
 #[tauri::command]
-fn show_main_window(app: AppHandle) {
-    let window = app.get_webview_window("main").unwrap();
-    window.show().expect("Failed to show main window");
+fn show_main_window(webview_window: tauri::WebviewWindow) {
+    webview_window.show().expect("Failed to show main window");
 }
 
 fn main() {
